@@ -106,7 +106,7 @@ RUN echo "Running pre-package commands"; \
 
 RUN echo "Setting up and installing packages"; \
   $SHELL_OPTS; \
-  if [ -n "${PACK_LIST}" ];then echo "Installing packages: $PACK_LIST";pkmgr install ${PACK_LIST};fi; \
+  if [ -n "${PACK_LIST}" ];then echo "Installing packages: $PACK_LIST";echo "${PACK_LIST}" >/root/docker/setup/packages.txt;pkmgr install ${PACK_LIST};fi; \
   echo ""
 
 RUN echo "Initializing packages before copying files to image"; \
