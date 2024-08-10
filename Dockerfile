@@ -77,7 +77,7 @@ RUN set -e; \
   pacman-key --init; \
   pacman-key --populate; \
   echo "installing bash"; \
-  pacman -Sy --noconfirm bash; \\
+  pacman -Sy --noconfirm bash; \
   BASH_CMD="$(command -v bash 2>/dev/null|| true)"; \
   [ -x "$BASH_CMD" ] && { rm -rf "/bin/sh" || true; } && ln -sf "$BASH_CMD" "/bin/sh" || true; \
   [ -n "$BASH_CMD" ] && sed -i 's|root:x:.*|root:x:0:0:root:/root:'$BASH_CMD'|g' "/etc/passwd" || true
