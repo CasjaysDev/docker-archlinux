@@ -2,7 +2,7 @@
 # Docker image for archlinux using the archlinux template
 ARG IMAGE_NAME="archlinux"
 ARG PHP_SERVER="archlinux"
-ARG BUILD_DATE="202408101733"
+ARG BUILD_DATE="202408111007"
 ARG LANGUAGE="en_US.UTF-8"
 ARG TIMEZONE="America/New_York"
 ARG WWW_ROOT_DIR="/usr/share/httpd/default"
@@ -85,7 +85,7 @@ RUN set -e; \
   [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/bin/sh" || true; \
   [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/usr/bin/sh" || true; \
   [ -x "$BASH_CMD" ] && [ "$SH_CMD" != "/bin/sh"] && symlink "$BASH_CMD" "$SH_CMD" || true; \
-  [ -n "$BASH_CMD" ] && sed -i 's|root:x:.*|root:x:0:0:root:/root:'\$BASH_CMD'|g' "/etc/passwd" || true
+  [ -n "$BASH_CMD" ] && sed -i 's|root:x:.*|root:x:0:0:root:/root:'$BASH_CMD'|g' "/etc/passwd" || true
 
 ENV SHELL="/bin/bash"
 SHELL [ "/bin/bash", "-c" ]
@@ -95,13 +95,14 @@ COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 RUN echo "Initializing the system"; \
   $SHELL_OPTS; \
   mkdir -p "${DEFAULT_DATA_DIR}" "${DEFAULT_CONF_DIR}" "${DEFAULT_TEMPLATE_DIR}" "/root/docker/setup" "/etc/profile.d"; \
-  if [ -f "/root/docker/setup/00-init.sh" ];then echo "Running the init script";bash "/root/docker/setup/00-init.sh";echo "Done running the init script";fi; \
+  if [ -f "/root/docker/setup/00-init.sh" ];then echo "Running the init script";/root/docker/setup/00-init.sh||{ echo "Failed to execute /root/docker/setup/00-init.sh" >&2 && exit 10; };echo "Done running the init script";fi; \
   echo ""
 
 RUN echo "Creating and editing system files "; \
   $SHELL_OPTS; \
   [ -f "/root/.profile" ] || touch "/root/.profile"; \
-  if [ -f "/root/docker/setup/01-system.sh" ];then echo "Running the system script";bash "/root/docker/setup/01-system.sh";echo "Done running the system script";fi; \
+  mkdir -p "${DEFAULT_DATA_DIR}" "${DEFAULT_CONF_DIR}" "${DEFAULT_TEMPLATE_DIR}" "/root/docker/setup" "/etc/profile.d"; \
+  if [ -f "/root/docker/setup/01-system.sh" ];then echo "Running the system script";/root/docker/setup/01-system.sh||{ echo "Failed to execute /root/docker/setup/01-system.sh" >&2 && exit 10; };echo "Done running the system script";fi; \
   echo ""
 
 RUN echo "Running pre-package commands"; \
@@ -115,7 +116,7 @@ RUN echo "Setting up and installing packages"; \
 
 RUN echo "Initializing packages before copying files to image"; \
   $SHELL_OPTS; \
-  if [ -f "/root/docker/setup/02-packages.sh" ];then echo "Running the packages script";bash "/root/docker/setup/02-packages.sh";echo "Done running the packages script";fi; \
+  if [ -f "/root/docker/setup/02-packages.sh" ];then echo "Running the packages script";/root/docker/setup/02-packages.sh||{ echo "Failed to execute /root/docker/setup/02-packages.sh" >&2 && exit 10; };echo "Done running the packages script";fi; \
   echo ""
 
 COPY ./rootfs/. /
@@ -141,12 +142,12 @@ RUN echo "Updating system files "; \
   if [ -z "$(command -v "apt-get" 2>/dev/null)" ];then grep -s -q 'alias quit' "/root/.bashrc" || printf '# Profile\n\n%s\n%s\n%s\n' '. /etc/profile' '. /root/.profile' "alias quit='exit 0 2>/dev/null'" >>"/root/.bashrc"; fi; \
   if [ "$PHP_VERSION" != "system" ] && [ -e "/etc/php" ] && [ -d "/etc/${PHP_VERSION}" ];then rm -Rf "/etc/php";fi; \
   if [ "$PHP_VERSION" != "system" ] && [ -n "${PHP_VERSION}" ] && [ -d "/etc/${PHP_VERSION}" ];then ln -sf "/etc/${PHP_VERSION}" "/etc/php";fi; \
-  if [ -f "/root/docker/setup/03-files.sh" ];then echo "Running the files script";bash "/root/docker/setup/03-files.sh";echo "Done running the files script";fi; \
-  echo ""
+  if [ -f "/root/docker/setup/03-files.sh" ];then echo "Running the files script";/root/docker/setup/03-files.sh||{ echo "Failed to execute /root/docker/setup/03-files.sh" >&2 && exit 10; };echo "Done running the files script";fi; \
+echo ""
 
 RUN echo "Custom Settings"; \
   $SHELL_OPTS; \
-  echo ""
+echo ""
 
 RUN echo "Setting up users and scripts "; \
   $SHELL_OPTS; \
@@ -161,7 +162,7 @@ RUN echo "Setting up users and scripts "; \
   sudo -u "${AUR_USER}" makepkg --noconfirm -si; \
   fi; \
   sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns; \
-  if [ -f "/root/docker/setup/04-users.sh" ];then echo "Running the users script";bash "/root/docker/setup/04-users.sh";echo "Done running the users script";fi; \
+  if [ -f "/root/docker/setup/04-users.sh" ];then echo "Running the users script";/root/docker/setup/04-users.sh||{ echo "Failed to execute /root/docker/setup/04-users.sh" >&2 && exit 10; };echo "Done running the users script";fi; \
   echo ""
 
 RUN echo "Running the user init commands"; \
@@ -174,15 +175,15 @@ RUN echo "Setting OS Settings "; \
 
 RUN echo "Custom Applications"; \
   $SHELL_OPTS; \
-  echo ""
+echo ""
 
 RUN echo "Running custom commands"; \
-  if [ -f "/root/docker/setup/05-custom.sh" ];then echo "Running the custom script";bash "/root/docker/setup/05-custom.sh";echo "Done running the custom script";fi; \
+  if [ -f "/root/docker/setup/05-custom.sh" ];then echo "Running the custom script";/root/docker/setup/05-custom.sh||{ echo "Failed to execute /root/docker/setup/05-custom" && exit 10; };echo "Done running the custom script";fi; \
   echo ""
 
 RUN echo "Running final commands before cleanup"; \
   $SHELL_OPTS; \
-  if [ -f "/root/docker/setup/06-post.sh" ];then echo "Running the post script";bash "/root/docker/setup/06-post.sh";echo "Done running the post script";fi; \
+  if [ -f "/root/docker/setup/06-post.sh" ];then echo "Running the post script";/root/docker/setup/06-post.sh||{ echo "Failed to execute /root/docker/setup/06-post.sh" >&2 && exit 10; };echo "Done running the post script";fi; \
   echo ""
 
 RUN echo "Deleting unneeded files"; \
@@ -198,7 +199,7 @@ RUN echo "Deleting unneeded files"; \
   rm -rf /lib/systemd/system/sockets.target.wants/*initctl* || true; \
   rm -Rf /usr/share/doc/* /var/tmp/* /var/cache/*/* /root/.cache/* /usr/share/info/* /tmp/* || true; \
   if [ -d "/lib/systemd/system/sysinit.target.wants" ];then cd "/lib/systemd/system/sysinit.target.wants" && rm -f $(ls | grep -v systemd-tmpfiles-setup);fi; \
-  if [ -f "/root/docker/setup/07-cleanup.sh" ];then echo "Running the cleanup script";bash "/root/docker/setup/07-cleanup.sh";echo "Done running the cleanup script";fi; \
+  if [ -f "/root/docker/setup/07-cleanup.sh" ];then echo "Running the cleanup script";/root/docker/setup/07-cleanup.sh||{ echo "Failed to execute /root/docker/setup/07-cleanup.sh" >&2 && exit 10; };echo "Done running the cleanup script";fi; \
   echo ""
 
 RUN echo "Init done"
