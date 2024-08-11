@@ -58,7 +58,7 @@ ARG SHELL_OPTS
 ARG AUR_USER
 ARG AUR_HOME
 
-ARG PACK_LIST="bash-completion git curl wget sudo unzip base-devel mailx postfix python python-pip certbot ca-certificates "
+ARG PACK_LIST="bash-completion git curl wget sudo unzip base-devel mailx postfix python python-pip certbot ca-certificates jq "
 
 ENV ENV=~/.profile
 ENV SHELL="/bin/sh"
@@ -82,10 +82,10 @@ RUN set -e; \
   pacman -Sy --noconfirm bash; \
   SH_CMD="$(which sh 2>/dev/null)"; \
   BASH_CMD="$(which bash 2>/dev/null)"; \
-  [ -x "\$BASH_CMD" ] && symlink "\$BASH_CMD" "/bin/sh" || true; \
-  [ -x "\$BASH_CMD" ] && symlink "\$BASH_CMD" "/usr/bin/sh" || true; \
-  [ -x "\$BASH_CMD" ] && [ "\$SH_CMD" != "/bin/sh"] && symlink "\$BASH_CMD" "\$SH_CMD" || true; \
-  [ -n "\$BASH_CMD" ] && sed -i 's|root:x:.*|root:x:0:0:root:/root:'\$BASH_CMD'|g' "/etc/passwd" || true
+  [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/bin/sh" || true; \
+  [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/usr/bin/sh" || true; \
+  [ -x "$BASH_CMD" ] && [ "$SH_CMD" != "/bin/sh"] && symlink "$BASH_CMD" "$SH_CMD" || true; \
+  [ -n "$BASH_CMD" ] && sed -i 's|root:x:.*|root:x:0:0:root:/root:'\$BASH_CMD'|g' "/etc/passwd" || true
 
 ENV SHELL="/bin/bash"
 SHELL [ "/bin/bash", "-c" ]
