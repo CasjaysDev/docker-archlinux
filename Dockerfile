@@ -2,7 +2,7 @@
 # Docker image for archlinux using the archlinux template
 ARG IMAGE_NAME="archlinux"
 ARG PHP_SERVER="archlinux"
-ARG BUILD_DATE="202408111007"
+ARG BUILD_DATE="202408111050"
 ARG LANGUAGE="en_US.UTF-8"
 ARG TIMEZONE="America/New_York"
 ARG WWW_ROOT_DIR="/usr/share/httpd/default"
@@ -80,8 +80,8 @@ RUN set -e; \
   pacman-key --populate; \
   echo "installing bash"; \
   pacman -Sy --noconfirm bash; \
-  SH_CMD="$(which sh 2>/dev/null)"; \
-  BASH_CMD="$(which bash 2>/dev/null)"; \
+  SH_CMD="$(which sh 2>/dev/null||command -v sh 2>/dev/null)"; \
+  BASH_CMD="$(which bash 2>/dev/null||command -v bash 2>/dev/null)"; \
   [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/bin/sh" || true; \
   [ -x "$BASH_CMD" ] && symlink "$BASH_CMD" "/usr/bin/sh" || true; \
   [ -x "$BASH_CMD" ] && [ "$SH_CMD" != "/bin/sh"] && symlink "$BASH_CMD" "$SH_CMD" || true; \
