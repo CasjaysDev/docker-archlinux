@@ -57,7 +57,6 @@ if [ $# -ne 2 ] || [ ! -e "$1" ]; then
   __printf_color "Usage: $APPNAME from to"
   exit 1
 else
-  [ -e "$2" ] && rm -Rf "$2"
   cp -Rf "$1" "$2"
   COPY_EXIT_STATUS=$?
 fi
