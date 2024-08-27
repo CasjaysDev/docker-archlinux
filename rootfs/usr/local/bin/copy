@@ -53,12 +53,17 @@ DEFAULT_COLOR="254"
 COPY_EXIT_STATUS=0
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main application
-if [ $# -ne 2 ] || [ ! -e "$1" ]; then
-  __printf_color "Usage: $APPNAME from to"
-  exit 1
-else
+{ [ $# -eq 2 ] || [ "$1" = "--help" ]; } || { __printf_color "Usage: $APPNAME fromFile toFile" && exit 1; }
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+if [ -d "$1" ]; then
+  mkdir -p "$2"
+  cp -Rf "$1/." "$2/"
+  COPY_EXIT_STATUS=$?
+elif [ -e "$1" ]; then
   cp -Rf "$1" "$2"
   COPY_EXIT_STATUS=$?
+else
+  COPY_EXIT_STATUS=2
 fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # End application
