@@ -35,10 +35,10 @@ SYMLINK_CWD="$(realpath "$PWD")"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # script functions
 if [ "$SHOW_RAW" != "true" ]; then
-  __printf_color() { printf "%b" "$(tput setaf "${2:-7}" 2>/dev/null)" "$1\n" "$(tput sgr0 2>/dev/null)"; }
+  __printf_color() { printf "%b" "$(tput setaf "${2:-$DEFAULT_COLOR}" 2>/dev/null)" "$1\n" "$(tput sgr0 2>/dev/null)"; }
 else
   # Disable colorization
-  __printf_color() { { [ -z "$2" ] || DEFAULT_COLOR=$2; } && printf '%b\n' "$1" | tr -d '\t' | sed '/^%b$/d;s,\x1B\[ 0-9;]*[a-zA-Z],,g'; }
+  __printf_color() { printf '%b\n' "$1" | tr -d '\t' | sed '/^%b$/d;s,\x1B\[ 0-9;]*[a-zA-Z],,g'; }
 fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # check for command
@@ -49,20 +49,22 @@ __function_exists() { builtin type $1 >/dev/null 2>&1 || return 1; }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Define Variables
-DEFAULT_COLOR="254"
+DEFAULT_COLOR="7"
 SYMLINK_EXIT_STATUS=0
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main application
 { [ $# -eq 2 ] || [ "$1" = "--help" ]; } || { __printf_color "Usage: $APPNAME fromFile toFile" && exit 1; }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-if [ -L "$2" ]; then
-  unlink "$2"
-elif [ -e "$2" ]; then
-  rm -Rf "$2"
-fi
-if [ -e "$1" ]; then
-  ln -sf "$1" "$2"
-  SYMLINK_EXIT_STATUS=$?
+if [ "$1" != "$2" ]; then
+  if [ -L "$2" ]; then
+    unlink "$2"
+  elif [ -e "$2" ]; then
+    rm -Rf "$2"
+  fi
+  if [ -e "$1" ]; then
+    ln -sf "$1" "$2"
+    SYMLINK_EXIT_STATUS=$?
+  fi
 fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # End application
