@@ -53,8 +53,9 @@ fi
 if [ -z "$(command -v yay 2>/dev/null)" ]; then
   if cd "$AUR_BUILD_DIR/yay"; then
     [ -n "$(type -P git)" ] && git config --global init.defaultBranch main
-    chmod -Rf 777 "$AUR_BUILD_DIR"
-    git clone --depth 1 "https://aur.archlinux.org/yay" "." && sudo -u "$AUR_USER" makepkg --noconfirm -si
+    chmod -R 777 "$AUR_BUILD_DIR"
+    git clone --depth 1 "https://aur.archlinux.org/yay" "." && rm -Rf ".git"
+    sudo -u "$AUR_USER" makepkg --noconfirm -si
     sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns || exit 1
   else
     exit 1
