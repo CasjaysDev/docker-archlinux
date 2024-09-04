@@ -14,7 +14,7 @@ ARG DEFAULT_TEMPLATE_DIR="/usr/local/share/template-files/defaults"
 ARG USER="root"
 ARG SHELL_OPTS="set -e -o pipefail"
 ARG AUR_USER="aur"
-ARG AUR_HOME="/home/aur"
+ARG AUR_HOME="/var/lib/aur"
 
 ARG SERVICE_PORT=""
 ARG EXPOSE_PORTS=""
@@ -67,6 +67,8 @@ ENV TIMEZONE="${TZ}"
 ENV LANG="${LANGUAGE}"
 ENV TERM="xterm-256color"
 ENV HOSTNAME="casjaysdev-archlinux"
+ENV AUR_HOME="${AUR_HOME}"
+ENV AUR_USER="${AUR_USER}"
 
 USER ${USER}
 WORKDIR /root
@@ -158,7 +160,7 @@ RUN echo "Setting up users and scripts "; \
   echo 'standard-resolver' >"${AUR_HOME}/.gnupg/dirmngr.conf" && \
   chown -Rf "${AUR_USER}":"${AUR_USER}" "${AUR_HOME}"; \
   if [ -z "$(command -v yay 2>/dev/null)" ];then cd "${AUR_HOME}/build" && \
-  sudo -u "${AUR_USER}" git clone --depth 1 "https://aur.archlinux.org/yay.git" && cd yay && \
+  git clone --depth 1 "https://aur.archlinux.org/yay.git" && cd yay && \
   sudo -u "${AUR_USER}" makepkg --noconfirm -si; \
   fi; \
   sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns; \
