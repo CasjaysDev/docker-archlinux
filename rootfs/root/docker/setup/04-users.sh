@@ -46,7 +46,7 @@ if [ -n "$(type -P sudo)" ] && grep -sq "^$AUR_USER:" /etc/passwd; then
 fi
 mkdir -p "$AUR_BUILD_DIR/yay"
 if ! grep -qs "standard-resolver" "$AUR_HOME/.gnupg/dirmngr.conf"; then
-  mkdir -p "$AUR_HOME.gnupg"
+  mkdir -p "$AUR_HOME/.gnupg"
   echo 'standard-resolver' >"$AUR_HOME/.gnupg/dirmngr.conf"
 fi
 if [ -z "$(command -v yay 2>/dev/null)" ]; then
