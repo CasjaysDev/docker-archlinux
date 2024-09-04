@@ -29,6 +29,7 @@ AUR_USER="${AUR_USER:-aur}"
 AUR_GROUP="${AUR_GROUP:-$AUR_USER}"
 AUR_HOME="${AUR_HOME:-/var/lib/aur}"
 AUR_BUILD_DIR="${AUR_BUILD_DIR:-${AUR_HOME}/build}"
+export GOFLAGS="-buildvcs=false"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
 rm -Rf "$AUR_BUILD_DIR/yay"
