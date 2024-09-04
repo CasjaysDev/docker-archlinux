@@ -153,17 +153,6 @@ RUN echo "Custom Settings"; \
 
 RUN echo "Setting up users and scripts "; \
   $SHELL_OPTS; \
-  if ! grep -s -q "${AUR_HOME}" /etc/passwd;then useradd -m -r -s /bin/bash -d "${AUR_HOME}" "${AUR_USER}";fi; \
-  passwd -d "${AUR_USER}"; \
-  [ -d "/etc/sudoers.d" ] || mkdir -p "/etc/sudoers.d"; \
-  echo ''${AUR_USER}'     ALL=(ALL) ALL' >"/etc/sudoers.d/${AUR_USER}" && \
-  echo 'standard-resolver' >"${AUR_HOME}/.gnupg/dirmngr.conf" && \
-  chown -Rf "${AUR_USER}":"${AUR_USER}" "${AUR_HOME}"; \
-  if [ -z "$(command -v yay 2>/dev/null)" ];then cd "${AUR_HOME}/build" && \
-  git clone --depth 1 "https://aur.archlinux.org/yay.git" && cd yay && \
-  sudo -u "${AUR_USER}" makepkg --noconfirm -si; \
-  fi; \
-  sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns; \
   if [ -f "/root/docker/setup/04-users.sh" ];then echo "Running the users script";/root/docker/setup/04-users.sh||{ echo "Failed to execute /root/docker/setup/04-users.sh" >&2 && exit 10; };echo "Done running the users script";fi; \
   echo ""
 

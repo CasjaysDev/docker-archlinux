@@ -24,12 +24,9 @@ set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set env variables
 exitCode=0
-AUR_USER="${AUR_USER:-aur}"
-AUR_HOME="${AUR_HOME:-/var/lib/aur}"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
-mkdir -p "${AUR_HOME}/build"
-mkdir -p "${AUR_HOME}/.gnupg"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?
