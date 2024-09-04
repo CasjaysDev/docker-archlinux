@@ -55,7 +55,8 @@ COPY_EXIT_STATUS=0
 # Main application
 { [ $# -eq 2 ] || [ "$1" = "--help" ]; } || { __printf_color "Usage: $APPNAME fromFile toFile" && exit 1; }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-if [ "$1" != "$2" ]; then
+is_link="$(ls -la "$2" 2>/dev/null | awk '{print $NF}')"
+if [ "$1" != "$is_link" ]; then
   if [ -d "$1" ]; then
     mkdir -p "$2"
     cp -Rf "$1/." "$2/"
