@@ -33,7 +33,8 @@ AUR_USER="${AUR_USER:-aur}"
 AUR_GROUP="${AUR_GROUP:-$AUR_USER}"
 AUR_HOME="${AUR_HOME:-/var/lib/aur}"
 AUR_BUILD_DIR="${AUR_BUILD_DIR:-${AUR_HOME}/build}"
-export GOFLAGS="-buildvcs=false"
+export GOFLAGS="-buildvcs=false" CGO_ENABLED=0 GOOS=linux
+case "$(uname -m)" in x86_64) export GOARCH=amd64 ;; aarch64) export GOARCH=arm64 ;; esac
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
 rm -Rf "$AUR_BUILD_DIR/yay"
