@@ -24,28 +24,41 @@ set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set env variables
 exitCode=0
+AUR_UID="9000"
 AUR_USER="${AUR_USER:-aur}"
+AUR_GROUP="${AUR_GROUP:-$AUR_USER}"
 AUR_HOME="${AUR_HOME:-/var/lib/aur}"
 AUR_BUILD_DIR="${AUR_BUILD_DIR:-${AUR_HOME}/build}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
-chmod 777 -f "${AUR_HOME}/build"
-if ! grep -s -q "${AUR_HOME}" /etc/passwd; then useradd -m -r -s /bin/bash -d "${AUR_HOME}" "${AUR_USER}" && passwd -d "${AUR_USER}" || exit 1; fi
-mkdir -p "${AUR_BUILD_DIR}"
-mkdir -p "${AUR_HOME}/.gnupg"
-[ -d "/etc/sudoers.d" ] || mkdir -p "/etc/sudoers.d"
-echo ''${AUR_USER}'     ALL=(ALL) ALL' >"/etc/sudoers.d/${AUR_USER}" &&
-  echo 'standard-resolver' >"${AUR_HOME}/.gnupg/dirmngr.conf" &&
-  chown -Rf "${AUR_USER}":"${AUR_USER}" "${AUR_HOME}"
+if ! grep -sq "^$AUR_GROUP:" /etc/group; then
+  echo "Creating group: $AUR_GROUP"
+  groupadd -r -g $AUR_UID $AUR_GROUP
+fi
+if ! grep -sq "^$AUR_USER:" /etc/passwd; then
+  echo "Creating user: $AUR_USER"
+  useradd -m -r -s /bin/bash -d "${AUR_HOME}" -u $AUR_UID -g $AUR_UID "$AUR_USER" && passwd -d "$AUR_USER"
+fi
+grep -sq "^$AUR_USER:" /etc/passwd && grep -sq "^$AUR_GROUP:" /etc/group && chown -Rf $AUR_USER:$AUR_GROUP "$AUR_HOME" || exit 1
+if [ -n "$(type -P sudo)" ] && grep -sq "^$AUR_USER:" /etc/passwd; then
+  mkdir -p "/etc/sudoers.d"
+  echo ''$AUR_USER'     ALL=(ALL) ALL' >"/etc/sudoers.d/$AUR_USER"
+fi
+mkdir -p "$AUR_BUILD_DIR/yay"
+if ! grep -qs "standard-resolver" "$AUR_HOME/.gnupg/dirmngr.conf"; then
+  mkdir -p "$AUR_HOME.gnupg"
+  echo 'standard-resolver' >"$AUR_HOME/.gnupg/dirmngr.conf"
+fi
 if [ -z "$(command -v yay 2>/dev/null)" ]; then
-  if cd "$AUR_BUILD_DIR"; then
+  if cd "$AUR_BUILD_DIR/yay"; then
     [ -n "$(type -P git)" ] && git config --global init.defaultBranch main
-    git clone --depth 1 "https://aur.archlinux.org/yay" "$AUR_BUILD_DIR/yay" && cd "$AUR_BUILD_DIR/yay" && sudo -u "${AUR_USER}" makepkg --noconfirm -si
+    chmod -Rf 777 "$AUR_BUILD_DIR"
+    git clone --depth 1 "https://aur.archlinux.org/yay" "." && sudo -u "$AUR_USER" makepkg --noconfirm -si
+    sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns
   else
     exit 1
   fi
 fi
-sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?
