@@ -31,6 +31,7 @@ AUR_HOME="${AUR_HOME:-/var/lib/aur}"
 AUR_BUILD_DIR="${AUR_BUILD_DIR:-${AUR_HOME}/build}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
+rm -Rf "$AUR_BUILD_DIR/yay"
 if ! grep -sq "^$AUR_GROUP:" /etc/group; then
   echo "Creating group: $AUR_GROUP"
   groupadd -r -g $AUR_UID $AUR_GROUP
@@ -54,7 +55,7 @@ if [ -z "$(command -v yay 2>/dev/null)" ]; then
     [ -n "$(type -P git)" ] && git config --global init.defaultBranch main
     chmod -Rf 777 "$AUR_BUILD_DIR"
     git clone --depth 1 "https://aur.archlinux.org/yay" "." && sudo -u "$AUR_USER" makepkg --noconfirm -si
-    sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns
+    sudo -u "${AUR_USER}" yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns || exit 1
   else
     exit 1
   fi
