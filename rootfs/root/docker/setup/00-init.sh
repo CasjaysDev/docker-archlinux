@@ -27,7 +27,9 @@ exitCode=0
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
-
+if grep -qs 'DisableSandbox$' '/etc/pacman.conf'; then
+  sed -i 's|#.*DisableSandbox|DisableSandbox|g' '/etc/pacman.conf'
+fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?
