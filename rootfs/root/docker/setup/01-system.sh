@@ -24,18 +24,10 @@ set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set env variables
 exitCode=0
-update_conf_files="$(find '/etc' -iname '*.pacnew')"
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
-if [ -n "$update_conf_files" ]; then
-  for conf in $update_conf_files; do
-    name="${conf//.pacnew/}"
-    mv -f "$conf" "$name"
-  done
-fi
-if grep -Rsqi 'DisableSandbox' /etc/pacman.conf*; then
-  sed -i 's|.*DisableSandbox|DisableSandbox|g' /etc/pacman.conf*
-fi
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?

@@ -24,10 +24,15 @@ set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set env variables
 exitCode=0
-
+update_conf_files="$(find '/etc' -iname '*.pacnew')"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Main script
-
+if [ -n "$update_conf_files" ]; then
+  for conf in $update_conf_files; do
+    name="${conf//.pacnew/}"
+    mv -f "$conf" "$name"
+  done
+fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?
