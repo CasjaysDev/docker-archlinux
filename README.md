@@ -66,4 +66,4 @@ cd "$HOME/Projects/github/dockersrc/archlinux" && buildx all
 ## Authors  
   
 🤖 casjay: [Github](https://github.com/casjay) 🤖  
-⛵ casjaysdevdocker: [Github](https://github.com/dockersrc) [Docker](https://hub.docker.com/u/casjaysdevdocker) ⛵  
+⛵ casjaysdev: [Github](https://github.com/dockersrc) [Docker](https://hub.docker.com/u/casjaysdev) ⛵  
