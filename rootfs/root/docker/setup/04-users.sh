@@ -65,6 +65,7 @@ if [ -z "$(command -v yay 2>/dev/null)" ]; then
     exit 1
   fi
 fi
+[ -n "$(type -P yay 2>/dev/null)" ]
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set the exit code
 exitCode=$?
