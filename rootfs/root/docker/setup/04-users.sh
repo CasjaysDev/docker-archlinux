@@ -24,7 +24,7 @@ set -o pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Set env variables
 exitCode=0
-AUR_UID="9000"
+AUR_UID="1000"
 AUR_USER="${AUR_USER:-aur}"
 AUR_GROUP="${AUR_GROUP:-$AUR_USER}"
 AUR_HOME="${AUR_HOME:-/var/lib/aur}"
@@ -57,8 +57,9 @@ if [ -z "$(command -v yay 2>/dev/null)" ]; then
     [ -n "$(type -P git)" ] && git config --global init.defaultBranch main
     chmod -R 777 "$AUR_BUILD_DIR"
     git clone --depth 1 "https://aur.archlinux.org/yay-bin" "." && rm -Rf ".git"
-    sudo -u "$AUR_USER" makepkg -sri --needed --noconfirm -si || exit 1
-    sudo -u root bash -c "(yay --afterclean --removemake --save && pacman -Qtdq | xargs -r pacman --noconfirm -Rcns || true)"
+    sudo -HE -u "$AUR_USER" makepkg -sri --needed --noconfirm -si || exit 1
+    sudo -HE -u "$AUR_USER" yay --afterclean --removemake --save --noconfirm &&
+      pacman -Qtdq | xargs -r pacman --noconfirm -Rcns || true
     [ -d "$AUR_BUILD_DIR" ] && cd && rm -Rf "${AUR_BUILD_DIR:?}"/* "$AUR_HOME/.cache"/* || true
   else
     exit 1
