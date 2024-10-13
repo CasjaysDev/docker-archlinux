@@ -58,8 +58,8 @@ if [ -z "$(command -v yay 2>/dev/null)" ]; then
     chmod -R 777 "$AUR_BUILD_DIR"
     git clone --depth 1 "https://aur.archlinux.org/yay-bin" "." && rm -Rf ".git"
     sudo -HE -u "$AUR_USER" makepkg -sri --needed --noconfirm -si || exit 1
-    sudo -HE -u "$AUR_USER" yay --afterclean --removemake --save --noconfirm &&
-      pacman -Qtdq | xargs -r pacman --noconfirm -Rcns || true
+    sudo -HE -u "$AUR_USER" yay --afterclean --removemake --save --noconfirm
+    pacman -Qtdq | xargs -r sudo -HE pacman --noconfirm -Rcns || true
     [ -d "$AUR_BUILD_DIR" ] && cd && rm -Rf "${AUR_BUILD_DIR:?}"/* "$AUR_HOME/.cache"/* || true
   else
     exit 1
