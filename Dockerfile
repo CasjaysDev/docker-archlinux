@@ -26,7 +26,7 @@ ARG IMAGE_REPO="casjaysdev/archlinux"
 ARG IMAGE_VERSION="latest"
 ARG CONTAINER_VERSION="USE_DATE"
 
-ARG PULL_URL="menci/archlinuxarm"
+ARG PULL_URL="ghcr.io/dockersrc/archlinux"
 ARG DISTRO_VERSION="${IMAGE_VERSION}"
 ARG BUILD_VERSION="${BUILD_DATE}"
 
