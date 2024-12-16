@@ -4,7 +4,7 @@ on: push
 
 jobs:
   archlinux-latest:
-    runs-on: act_runner
+    runs-on: ubuntu-latest
     container:
       image: catthehacker/ubuntu:act-latest
     env:
