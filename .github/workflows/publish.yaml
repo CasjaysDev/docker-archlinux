@@ -54,10 +54,7 @@ jobs:
           platforms: |
             linux/amd64
             linux/arm64
-          outputs: |
-            type=image,name=target,annotation-index.org.opencontainers.image.licenses=WTFPL
-            type=image,name=target,annotation-index.org.opencontainers.image.source=http://github.com/dockersrc/archlinux
-            type=image,name=target,annotation-index.org.opencontainers.image.description=Containerized version of archlinux
+          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=Containerized version of archlinux
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.DATE_TAG }}
             ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.DOCKER_TAG }}
