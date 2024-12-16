@@ -5,6 +5,11 @@ on: push
 jobs:
   archlinux-latest:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
     container:
       image: catthehacker/ubuntu:act-latest
     env:
@@ -49,6 +54,6 @@ jobs:
             linux/amd64
             linux/arm64
           push: true
-          tags: | # replace it with your local IP and tags
-            ${{ steps.meta.outputs.DOCKER_HUB }}/${{ steps.meta.outputs.DOCKER_ORG }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DATE_TAG }}
-            ${{ steps.meta.outputs.DOCKER_HUB }}/${{ steps.meta.outputs.DOCKER_ORG }}/${{ steps.meta.outputs.REPO_NAME }}:${{ steps.meta.outputs.DOCKER_TAG }}
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.DATE_TAG }}
+            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.DOCKER_TAG }}
