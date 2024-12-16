@@ -1,4 +1,4 @@
-name: release-tag
+name: archlinux-latest
 
 on: push
 
