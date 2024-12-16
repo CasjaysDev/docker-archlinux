@@ -3,7 +3,7 @@ name: archlinux-latest
 on: push
 
 jobs:
-  release-image:
+  archlinux-latest:
     runs-on: act_runner
     container:
       image: catthehacker/ubuntu:act-latest
