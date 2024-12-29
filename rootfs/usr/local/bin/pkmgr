@@ -5,6 +5,13 @@
 USER_UID="$(id -u)"
 USER_GID="$(id -g)"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+while :; do
+  case "$@" in
+  --*) shift ;;
+  *) break ;;
+  esac
+done
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 if [ -x "$(command -v apt 2>/dev/null)" ]; then
   export DEBIAN_FRONTEND=noninteractive
   pkmgr_cmd="apt"
