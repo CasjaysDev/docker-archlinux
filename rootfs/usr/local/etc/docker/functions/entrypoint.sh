@@ -124,9 +124,13 @@ __init_working_dir() {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 __exec_service() {
+  local count=6
   echo "Starting $1"
-  eval "$@" 2>>/dev/stderr &
-  [ $? -eq 0 ] && touch "/run/init.d/$1.pid" || return 1
+  eval "$@" 2>>/dev/stderr >>/data/logs/start.log &
+  while [ $count -ne 0 ]; do
+    sleep 10
+    __pgrep $1 && touch "/run/init.d/$1.pid" && break || count=$((count - 1))
+  done
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 __update_ssl_certs() {
@@ -418,7 +422,7 @@ __file_copy() {
 __generate_random_uids() {
   local set_random_uid="$(seq 3000 5000 | sort -R | head -n 1)"
   while :; do
-    if grep -qs "x:.*:$set_random_uid:" "/etc/group" && ! grep -shq "x:$set_random_uid:.*:" "/etc/passwd"; then
+    if grep -shq "x:.*:$set_random_uid:" "/etc/group" && ! grep -shq "x:$set_random_uid:.*:" "/etc/passwd"; then
       set_random_uid=$((set_random_uid + 1))
     else
       echo "$set_random_uid"
@@ -538,7 +542,7 @@ __create_service_user() {
   local create_gid="${5:-${SERVICE_GID:-$USER_GID}}"
   local random_id="$(__generate_random_uids)"
   local create_home_dir="${create_home_dir:-/home/$create_user}"
-  grep -shq "^$create_user:" "/etc/passwd" && grep -sh "^$create_group:" "/etc/group" && return
+  grep -shq "^$create_user:" "/etc/passwd" && grep -shq "^$create_group:" "/etc/group" && return
   [ "$create_user" = "root" ] && [ "$create_group" = "root" ] && return 0
   if [ "$RUNAS_USER" != "root" ] && [ "$RUNAS_USER" != "" ]; then
     create_user="$RUNAS_USER"
@@ -566,8 +570,8 @@ __create_service_user() {
     echo "creating system user $create_user"
     useradd --system -u $create_uid -g $create_group -c "Account for $create_user" -d "$create_home_dir" -s /bin/false $create_user 2>/dev/stderr | tee -p -a "/data/logs/init.txt" >/dev/null
   fi
-  grep -qs "$create_group" "/etc/group" || exitStatus=$((exitCode + 1))
-  grep -qs "$create_user" "/etc/passwd" || exitStatus=$((exitCode + 1))
+  grep -shq "$create_group" "/etc/group" || exitStatus=$((exitCode + 1))
+  grep -shq "$create_user" "/etc/passwd" || exitStatus=$((exitCode + 1))
   if [ $exitStatus -eq 0 ]; then
     export WORK_DIR="${create_home_dir:-}"
     if [ -n "$WORK_DIR" ]; then
